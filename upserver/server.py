@@ -53,7 +53,9 @@ class FileServer:
         Returns:
             Path: Path to the saved file
         """
-        file_path = self.upload_dir / filename
+        # Prevent path traversal attacks by using only the filename component
+        safe_filename = Path(filename).name
+        file_path = self.upload_dir / safe_filename
         with open(file_path, 'wb') as f:
             f.write(file_data)
         return file_path
@@ -71,7 +73,9 @@ class FileServer:
         Raises:
             FileNotFoundError: If the file doesn't exist
         """
-        file_path = self.upload_dir / filename
+        # Prevent path traversal attacks by using only the filename component
+        safe_filename = Path(filename).name
+        file_path = self.upload_dir / safe_filename
         if not file_path.exists():
             raise FileNotFoundError(f"File '{filename}' not found")
         

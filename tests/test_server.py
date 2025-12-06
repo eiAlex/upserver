@@ -84,3 +84,28 @@ class TestFileServer:
             
             server = FileServer(upload_dir=str(upload_path))
             assert upload_path.exists()
+    
+    def test_path_traversal_protection_upload(self, temp_dir):
+        """Test that path traversal attacks are prevented in upload."""
+        server = FileServer(upload_dir=temp_dir)
+        test_data = b"malicious content"
+        
+        # Try to upload with path traversal
+        result = server.upload_file(test_data, "../../../malicious.txt")
+        
+        # File should be saved in the upload directory, not outside
+        assert result.parent == Path(temp_dir)
+        assert result.name == "malicious.txt"
+    
+    def test_path_traversal_protection_download(self, temp_dir):
+        """Test that path traversal attacks are prevented in download."""
+        server = FileServer(upload_dir=temp_dir)
+        test_data = b"safe content"
+        
+        # Upload a legitimate file
+        server.upload_file(test_data, "safe.txt")
+        
+        # Try to download with path traversal
+        # Should look for "etc/passwd" as a filename, not as a path
+        with pytest.raises(FileNotFoundError):
+            server.download_file("../../../etc/passwd")
