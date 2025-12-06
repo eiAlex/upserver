@@ -36,10 +36,16 @@ class FileServer:
         """
         Start the file server.
         
-        This is a placeholder method to be implemented with actual server logic.
+        This is a placeholder method. The actual server implementation
+        will be added in a future update. Currently, it only prints
+        startup information.
+        
+        TODO: Implement actual server logic with HTTP endpoints for
+        file upload and download operations.
         """
         print(f"File server starting on {self.host}:{self.port}")
         print(f"Upload directory: {self.upload_dir.absolute()}")
+        print("Note: This is a placeholder. Server implementation coming soon.")
         # TODO: Implement actual server logic
     
     def upload_file(self, file_data, filename):
