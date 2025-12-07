@@ -110,46 +110,46 @@ jobs:
         name: dist
         path: dist/
 
-  publish-pypi:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: pypi
-      url: https://pypi.org/p/upserver
-    
-    steps:
-    - uses: actions/checkout@v4
-    
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.11'
-    
-    - name: Download build artifacts
-      uses: actions/download-artifact@v4
-      with:
-        name: dist
-        path: dist/
-    
-    - name: Display package info
-      run: |
-        echo "🚀 Publishing to PyPI (PRODUCTION)..."
-        echo "Branch: ${{ github.ref }}"
-        echo "Commit: ${{ github.sha }}"
-        echo "Author: ${{ github.actor }}"
-        ls -la dist/
-    
-    - name: Publish to PyPI
-      uses: pypa/gh-action-pypi-publish@release/v1
-      with:
-        user: __token__
-        password: ${{ secrets.PYPI_API_TOKEN }}
-        verbose: true
+  # publish-pypi:
+  #   if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+  #   needs: build
+  #   runs-on: ubuntu-latest
+  #   environment:
+  #     name: pypi
+  #     url: https://pypi.org/p/upserver
+  #   
+  #   steps:
+  #   - uses: actions/checkout@v4
+  #   
+  #   - name: Set up Python
+  #     uses: actions/setup-python@v5
+  #     with:
+  #       python-version: '3.11'
+  #   
+  #   - name: Download build artifacts
+  #     uses: actions/download-artifact@v4
+  #     with:
+  #       name: dist
+  #       path: dist/
+  #   
+  #   - name: Display package info
+  #     run: |
+  #       echo "🚀 Publishing to PyPI (PRODUCTION)..."
+  #       echo "Branch: ${{ github.ref }}"
+  #       echo "Commit: ${{ github.sha }}"
+  #       echo "Author: ${{ github.actor }}"
+  #       ls -la dist/
+  #   
+  #   - name: Publish to PyPI
+  #     uses: pypa/gh-action-pypi-publish@release/v1
+  #     with:
+  #       user: __token__
+  #       password: ${{ secrets.PYPI_API_TOKEN }}
+  #       verbose: true
 
   create-release:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    needs: publish-pypi
+    needs: build
     runs-on: ubuntu-latest
     permissions:
       contents: write
