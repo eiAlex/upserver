@@ -34,7 +34,7 @@ class FileServer:
     def __init__(
         self,
         upload_dir="uploads",
-        host="0.0.0.0",
+        host="0.0.0.0",  # nosec B104 - intentional for file server access
         port=8000,
         chunk_size=5 * 1024 * 1024,
     ):
@@ -112,10 +112,10 @@ class FileServer:
         print(f"📅 Date/Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
         print(f"🖥️  System: {system_info['system']} {system_info['release']}")
         print(f"🐍 Python: {system_info['python_version']}")
-        print(
-            f"📍 URL: http://"
-            f"{self.host if self.host != '0.0.0.0' else 'localhost'}:{self.port}"
-        )
+        host_display = (
+            self.host if self.host != "0.0.0.0" else "localhost"
+        )  # nosec B104
+        print(f"📍 URL: http://{host_display}:{self.port}")
         print(f"📁 Upload Directory: {self.upload_dir}")
         print(f"📁 Temp Directory: {self.temp_dir}")
         print(f"💾 Total Space: {total_gb:.2f} GB")
@@ -128,9 +128,11 @@ class FileServer:
         print("=" * 70)
         print("\n🟢 SERVER ONLINE AND READY FOR UPLOADS")
         print("👀 Waiting for connections...")
+        host_display = (
+            self.host if self.host != "0.0.0.0" else "localhost"
+        )  # nosec B104
         print(
-            f"💡 Tip: Open http://"
-            f"{self.host if self.host != '0.0.0.0' else 'localhost'}:{self.port} "
+            f"💡 Tip: Open http://{host_display}:{self.port} "
             f"in browser to upload, list and download files"
         )
         print("🛑 Press Ctrl+C to stop the server\n" + "=" * 70)

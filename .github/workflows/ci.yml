@@ -72,8 +72,8 @@ jobs:
     
     - name: Run security scan with bandit
       run: |
-        bandit -r upserver/ -f json -o bandit-report.json || true
-        bandit -r upserver/
+        bandit -r upserver/ -c .bandit -f json -o bandit-report.json || true
+        bandit -r upserver/ -c .bandit
     
     - name: Check for known vulnerabilities
       run: |

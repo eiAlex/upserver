@@ -1,0 +1,11 @@
+exclude_dirs:
+  - .venv
+  - venv
+  - env
+  - __pycache__
+  - .git
+
+skips:
+  - B104  # Hardcoded bind all interfaces - acceptable for file server
+
+tests: []

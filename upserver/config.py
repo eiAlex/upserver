@@ -26,7 +26,7 @@ class ServerConfig:
         allowed_origins (list): List of allowed origins for CORS
     """
 
-    host: str = "0.0.0.0"
+    host: str = "0.0.0.0"  # nosec B104 - intentional binding for file server
     port: int = 8000
     upload_dir: str = "uploads"
     chunk_size: int = 5 * 1024 * 1024  # 5MB
@@ -89,7 +89,7 @@ class ServerConfig:
             ServerConfig: Configuration with values from environment
         """
         return cls(
-            host=os.getenv("UPSERVER_HOST", "0.0.0.0"),
+            host=os.getenv("UPSERVER_HOST", "0.0.0.0"),  # nosec B104
             port=int(os.getenv("UPSERVER_PORT", "8000")),
             upload_dir=os.getenv("UPSERVER_UPLOAD_DIR", "uploads"),
             chunk_size=int(os.getenv("UPSERVER_CHUNK_SIZE", str(5 * 1024 * 1024))),
