@@ -4,7 +4,7 @@ Logging configuration for the upserver package.
 
 import logging
 import sys
-from datetime import datetime
+
 from pathlib import Path
 from typing import Optional
 
