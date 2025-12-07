@@ -420,6 +420,154 @@ For optimal performance:
 - Configure appropriate file size limits
 - Monitor system resources during large transfers
 
+## 🛠️ Development
+
+### Setting Up Development Environment
+
+1. **Clone the repository:**
+```bash
+git clone https://github.com/eiAlex/upserver.git
+cd upserver
+```
+
+2. **Create and activate virtual environment:**
+```bash
+python -m venv .venv
+
+# Windows
+source .venv/Scripts/activate
+
+# Linux/macOS  
+source .venv/bin/activate
+```
+
+3. **Install development dependencies:**
+```bash
+pip install -r requirements.txt
+pip install -r requirements-dev.txt
+```
+
+### Code Quality Tools
+
+This project uses several tools to maintain code quality:
+
+#### 🎨 Code Formatting
+```bash
+# Format all Python files
+black .
+
+# Check formatting without making changes
+black --check .
+```
+
+#### 🔍 Linting
+```bash
+# Run flake8 linter
+flake8
+
+# Fix specific issues manually based on output
+```
+
+#### 🏷️ Type Checking
+```bash
+# Run mypy type checker
+mypy upserver/
+
+# Check specific files
+mypy upserver/server.py
+```
+
+#### 🔒 Security Analysis
+```bash
+# Run bandit security linter
+bandit -r upserver -c .bandit
+
+# Check for known vulnerabilities
+safety scan
+```
+
+#### 🧪 Running Tests
+```bash
+# Run all tests
+pytest
+
+# Run with coverage
+pytest --cov=upserver
+
+# Run specific test file
+pytest tests/test_server.py
+```
+
+### Pre-commit Quality Checks
+
+Before pushing code, run all quality checks:
+
+```bash
+# Quick quality check script
+python scripts/build_helper.py quality
+
+# Or run individual tools:
+black --check .
+flake8
+mypy upserver
+bandit -r upserver -c .bandit
+safety scan
+pytest
+```
+
+### Build and Package
+
+```bash
+# Clean previous builds
+python scripts/build_helper.py clean
+
+# Build package
+python scripts/build_helper.py build
+# or
+python -m build
+
+# The built packages will be in dist/
+```
+
+### Development Workflow
+
+1. **Create feature branch**: `git checkout -b feature/your-feature`
+2. **Make changes** with proper code formatting and type hints
+3. **Run quality checks**: `python scripts/build_helper.py quality`
+4. **Run tests**: `pytest`
+5. **Commit changes**: `git commit -m "feat: description"`
+6. **Push and create PR**: `git push origin feature/your-feature`
+
+### CI/CD Pipeline
+
+The project uses GitHub Actions for automated:
+
+- **✅ Testing**: Multi-platform testing (Windows, Linux, macOS)
+- **🔍 Code Quality**: Black, flake8, mypy checks
+- **🔒 Security**: Bandit and Safety scans
+- **📦 Building**: Automated package building
+- **🚀 Publishing**: Automatic PyPI publishing on main branch
+
+### Configuration Files
+
+- **`.flake8`**: Linting configuration with specific ignores
+- **`.bandit`**: Security scanner configuration  
+- **`pyproject.toml`**: Project metadata and mypy settings
+- **`requirements-dev.txt`**: Development dependencies
+- **`.github/workflows/ci.yml`**: CI/CD pipeline definition
+
+### Helper Scripts
+
+The `scripts/build_helper.py` provides convenient commands:
+
+```bash
+python scripts/build_helper.py clean    # Clean build artifacts
+python scripts/build_helper.py deps     # Install dependencies  
+python scripts/build_helper.py test     # Run tests
+python scripts/build_helper.py quality  # Run all quality checks
+python scripts/build_helper.py build    # Build package
+```
+
 ## Support
 
 If you encounter any problems or have suggestions, please open an issue on the [GitHub repository](https://github.com/eiAlex/upserver/issues).

@@ -247,7 +247,12 @@ class ResumableUploadHandler(BaseHTTPRequestHandler):
                         part.split(b"\r\n\r\n", 1)[1].rsplit(b"\r\n", 1)[0]
                     )  # noqa: F841
 
-            if not chunk_data or filename is None:
+            if (
+                not chunk_data
+                or filename is None
+                or chunk_index is None
+                or total_chunks is None
+            ):
                 raise Exception("Missing required data")
 
             chunk_kb = len(chunk_data) / 1024
