@@ -4,7 +4,7 @@ Main server module for file upload and download functionality.
 
 import os
 import sys
-import platform
+
 from datetime import datetime
 from http.server import HTTPServer
 from pathlib import Path
