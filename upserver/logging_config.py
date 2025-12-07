@@ -69,7 +69,8 @@ def setup_logging(
 
     # Create formatters
     detailed_formatter = logging.Formatter(
-        "%(asctime)s - %(name)s - %(levelname)s - %(funcName)s:%(lineno)d - %(message)s",
+        "%(asctime)s - %(name)s - %(levelname)s - "
+        "%(funcName)s:%(lineno)d - %(message)s",
         datefmt="%Y-%m-%d %H:%M:%S",
     )
 

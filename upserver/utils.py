@@ -56,7 +56,7 @@ def sanitize_filename(filename):
     if len(name.encode("utf-8")) > max_len:
         # Try to preserve extension
         name_no_ext, ext = os.path.splitext(name)
-        max_no_ext_len = max_len - len(ext.encode("utf-8"))
+        _ = max_len - len(ext.encode("utf-8"))  # noqa: F841
         # Truncate name_no_ext to fit
         while len((name_no_ext + ext).encode("utf-8")) > max_len and name_no_ext:
             name_no_ext = name_no_ext[:-1]

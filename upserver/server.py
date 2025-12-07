@@ -2,7 +2,6 @@
 Main server module for file upload and download functionality.
 """
 
-import os
 import sys
 
 from datetime import datetime
@@ -114,7 +113,8 @@ class FileServer:
         print(f"🖥️  System: {system_info['system']} {system_info['release']}")
         print(f"🐍 Python: {system_info['python_version']}")
         print(
-            f"📍 URL: http://{self.host if self.host != '0.0.0.0' else 'localhost'}:{self.port}"
+            f"📍 URL: http://"
+            f"{self.host if self.host != '0.0.0.0' else 'localhost'}:{self.port}"
         )
         print(f"📁 Upload Directory: {self.upload_dir}")
         print(f"📁 Temp Directory: {self.temp_dir}")
@@ -122,14 +122,16 @@ class FileServer:
         print(f"💾 Used Space: {used_gb:.2f} GB")
         print(f"💾 Free Space: {free_gb:.2f} GB")
         print(f"📦 Chunk Size: {self.chunk_size / (1024*1024):.1f} MB")
-        print(f"🔄 Resumable: YES")
-        print(f"⏸️ Pause/Resume: YES")
-        print(f"📂 Accepts: ANY FILE TYPE")
+        print("🔄 Resumable: YES")
+        print("⏸️ Pause/Resume: YES")
+        print("📂 Accepts: ANY FILE TYPE")
         print("=" * 70)
         print("\n🟢 SERVER ONLINE AND READY FOR UPLOADS")
         print("👀 Waiting for connections...")
         print(
-            f"💡 Tip: Open http://{self.host if self.host != '0.0.0.0' else 'localhost'}:{self.port} in browser to upload, list and download files"
+            f"💡 Tip: Open http://"
+            f"{self.host if self.host != '0.0.0.0' else 'localhost'}:{self.port} "
+            f"in browser to upload, list and download files"
         )
         print("🛑 Press Ctrl+C to stop the server\n" + "=" * 70)
         sys.stdout.flush()

@@ -20,7 +20,9 @@ def create_parser():
         argparse.ArgumentParser: Configured argument parser
     """
     parser = argparse.ArgumentParser(
-        description="upserver - A resumable file server for uploading and downloading files",
+        description=(
+            "upserver - A resumable file server for uploading and downloading files"
+        ),
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:

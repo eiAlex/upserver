@@ -82,7 +82,8 @@ class TestFileServer:
             upload_path = Path(temp_dir) / "new_uploads"
             assert not upload_path.exists()
 
-            server = FileServer(upload_dir=str(upload_path))
+            # server = FileServer(upload_dir=str(upload_path))
+            FileServer(upload_dir=str(upload_path))  # noqa: F841
             assert upload_path.exists()
 
     def test_path_traversal_protection_upload(self, temp_dir):

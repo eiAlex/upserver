@@ -98,10 +98,12 @@ class ResumableUploadHandler(BaseHTTPRequestHandler):
             f"[{timestamp}] 📍 Client: {self.client_address[0]}:{self.client_address[1]}"
         )
         print(
-            f"[{timestamp}] 📦 Content-Length: {self.headers.get('Content-Length', 'N/A')} bytes"
+            f"[{timestamp}] 📦 Content-Length: "
+            f"{self.headers.get('Content-Length', 'N/A')} bytes"
         )
         print(
-            f"[{timestamp}] 🔧 Content-Type: {self.headers.get('Content-Type', 'N/A')[:50]}..."
+            f"[{timestamp}] 🔧 Content-Type: "
+            f"{self.headers.get('Content-Type', 'N/A')[:50]}..."
         )
         print(f"{'='*60}")
 
@@ -219,7 +221,6 @@ class ResumableUploadHandler(BaseHTTPRequestHandler):
             filename = None
             chunk_index = None
             total_chunks = None
-            file_size = None
 
             print(f"[{timestamp}] 🔍 Extracting form fields...")
 
@@ -241,7 +242,10 @@ class ResumableUploadHandler(BaseHTTPRequestHandler):
                         part.split(b"\r\n\r\n", 1)[1].rsplit(b"\r\n", 1)[0]
                     )
                 elif b'name="fileSize"' in part:
-                    file_size = int(part.split(b"\r\n\r\n", 1)[1].rsplit(b"\r\n", 1)[0])
+                    # File size extracted but not used
+                    _ = int(
+                        part.split(b"\r\n\r\n", 1)[1].rsplit(b"\r\n", 1)[0]
+                    )  # noqa: F841
 
             if not chunk_data or filename is None:
                 raise Exception("Missing required data")
@@ -274,7 +278,8 @@ class ResumableUploadHandler(BaseHTTPRequestHandler):
             if (chunk_index + 1) % 100 == 0 or chunk_index + 1 >= total_chunks:
                 print(f"\n{'='*60}")
                 print(
-                    f"[{timestamp}] 📊 PROGRESS: {chunk_index + 1}/{total_chunks} ({percent}%)"
+                    f"[{timestamp}] 📊 PROGRESS: "
+                    f"{chunk_index + 1}/{total_chunks} ({percent}%)"
                 )
                 print(f"[{timestamp}] 📦 Current size: {current_mb:.2f} MB")
                 print(f"{'='*60}\n")
@@ -290,7 +295,7 @@ class ResumableUploadHandler(BaseHTTPRequestHandler):
                 size_gb = final_size / 1024 / 1024 / 1024
 
                 print(f"\n{'='*70}")
-                print(f"✅✅✅ FILE COMPLETELY RECEIVED SUCCESSFULLY! ✅✅✅")
+                print("✅✅✅ FILE COMPLETELY RECEIVED SUCCESSFULLY! ✅✅✅")
                 print(f"{'='*70}")
                 print(f"📁 File: {final_path}")
                 print(f"📦 Size: {size_gb:.2f} GB ({final_size:,} bytes)")
