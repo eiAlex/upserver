@@ -37,7 +37,7 @@ jobs:
     
     - name: Run linting
       run: |
-        flake8 upserver/ tests/ --max-line-length=88 --extend-ignore=E203,W503
+        flake8 upserver/ tests/
     
     - name: Run type checking
       run: |

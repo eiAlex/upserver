@@ -5,7 +5,7 @@ Configuration management for the upserver package.
 import os
 import json
 from pathlib import Path
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass, asdict, field
 from typing import Optional
 
 
@@ -34,7 +34,7 @@ class ServerConfig:
     enable_logging: bool = True
     log_file: Optional[str] = None
     cors_enabled: bool = True
-    allowed_origins: list = None
+    allowed_origins: list = field(default_factory=list)
 
     def __post_init__(self):
         """

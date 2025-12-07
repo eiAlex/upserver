@@ -112,7 +112,11 @@ class ServerLogger:
         self.request_counter = 0
 
     def log_request(
-        self, method: str, path: str, client_address: tuple, user_agent: str = None
+        self,
+        method: str,
+        path: str,
+        client_address: tuple,
+        user_agent: Optional[str] = None,
     ):
         """
         Log HTTP request details.
@@ -161,7 +165,7 @@ class ServerLogger:
             f"(avg {speed_mbps:.2f} MB/s)"
         )
 
-    def log_error(self, message: str, exception: Exception = None):
+    def log_error(self, message: str, exception: Optional[Exception] = None):
         """
         Log error with optional exception details.
         """
