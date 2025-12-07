@@ -4,7 +4,7 @@ Command-line interface for the upserver package.
 
 import argparse
 import sys
-from pathlib import Path
+
 
 from .server import FileServer
 from .config import ServerConfig

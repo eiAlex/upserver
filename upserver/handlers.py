@@ -8,9 +8,9 @@ import time
 import threading
 from datetime import datetime
 from http.server import BaseHTTPRequestHandler
-from pathlib import Path
 
-from .utils import sanitize_filename, format_file_size
+
+from .utils import sanitize_filename
 from .templates import get_upload_page_html
 
 
