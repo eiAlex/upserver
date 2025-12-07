@@ -1,0 +1,229 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  release:
+    types: [ published ]
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: ['3.9', '3.10', '3.11', '3.12', '3.13']
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -e .
+        pip install pytest pytest-cov black flake8 mypy
+    
+    - name: Run code formatting check
+      run: |
+        python -m black --check upserver/ tests/
+    
+    - name: Run linting
+      run: |
+        flake8 upserver/ tests/
+    
+    - name: Run type checking
+      run: |
+        mypy upserver/ --ignore-missing-imports
+    
+    - name: Run tests
+      run: |
+        pytest tests/ -v --cov=upserver --cov-report=xml --cov-report=term-missing
+    
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v4
+      with:
+        file: ./coverage.xml
+        flags: unittests
+        name: codecov-umbrella
+        fail_ci_if_error: false
+
+  security:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install bandit safety
+    
+    - name: Run security scan with bandit
+      run: |
+        bandit -r upserver -c .bandit -f json -o bandit-report.json || true
+        bandit -r upserver -c .bandit
+    
+    - name: Check for known vulnerabilities
+      run: |
+        safety scan || true
+
+  build:
+    needs: [test, security]
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+    
+    - name: Install build dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install build twine
+    
+    - name: Build package
+      run: |
+        python -m build
+    
+    - name: Check package
+      run: |
+        python -m twine check dist/*
+    
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: dist
+        path: dist/
+
+  publish-pypi:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/upserver
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+    
+    - name: Download build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: dist
+        path: dist/
+    
+    - name: Display package info
+      run: |
+        echo "🚀 Publishing to PyPI (PRODUCTION)..."
+        echo "Branch: ${{ github.ref }}"
+        echo "Commit: ${{ github.sha }}"
+        echo "Author: ${{ github.actor }}"
+        ls -la dist/
+    
+    - name: Publish to PyPI
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        user: __token__
+        password: ${{ secrets.PYPI_API_TOKEN }}
+        verbose: true
+
+  create-release:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: publish-pypi
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+    
+    - name: Extract version from pyproject.toml
+      id: get_version
+      run: |
+        VERSION=$(python -c "import tomllib; print(tomllib.load(open('pyproject.toml', 'rb'))['project']['version'])")
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+        echo "tag=v$VERSION" >> $GITHUB_OUTPUT
+    
+    - name: Check if release exists
+      id: check_release
+      run: |
+        TAG="v${{ steps.get_version.outputs.version }}"
+        if git rev-parse "$TAG" >/dev/null 2>&1; then
+          echo "exists=true" >> $GITHUB_OUTPUT
+        else
+          echo "exists=false" >> $GITHUB_OUTPUT
+        fi
+    
+    - name: Generate release notes
+      if: steps.check_release.outputs.exists == 'false'
+      id: release_notes
+      run: |
+        VERSION="${{ steps.get_version.outputs.version }}"
+        echo "# 🚀 Release v$VERSION" > release_notes.md
+        echo "" >> release_notes.md
+        echo "## 📦 What's New" >> release_notes.md
+        echo "" >> release_notes.md
+        
+        # Get commits since last tag
+        LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+        if [ -n "$LAST_TAG" ]; then
+          echo "### Changes since $LAST_TAG:" >> release_notes.md
+          git log $LAST_TAG..HEAD --oneline --pretty=format:"- %s (%h)" >> release_notes.md
+        else
+          echo "### Initial release:" >> release_notes.md
+          git log --oneline --pretty=format:"- %s (%h)" | head -10 >> release_notes.md
+        fi
+        
+        echo "" >> release_notes.md
+        echo "## 📥 Installation" >> release_notes.md
+        echo "" >> release_notes.md
+        echo "\`\`\`bash" >> release_notes.md
+        echo "pip install upserver==$VERSION" >> release_notes.md
+        echo "\`\`\`" >> release_notes.md
+        echo "" >> release_notes.md
+        echo "## 🔗 Links" >> release_notes.md
+        echo "" >> release_notes.md
+        echo "- 📋 [PyPI Package](https://pypi.org/project/upserver/$VERSION/)" >> release_notes.md
+        echo "- 📖 [Documentation](https://github.com/eiAlex/upserver#readme)" >> release_notes.md
+        echo "- 🐛 [Report Issues](https://github.com/eiAlex/upserver/issues)" >> release_notes.md
+    
+    - name: Create Release
+      if: steps.check_release.outputs.exists == 'false'
+      uses: ncipollo/create-release@v1
+      with:
+        tag: ${{ steps.get_version.outputs.tag }}
+        name: Release ${{ steps.get_version.outputs.tag }}
+        bodyFile: release_notes.md
+        draft: false
+        prerelease: false
+        generateReleaseNotes: false
+        makeLatest: true
+        token: ${{ secrets.GITHUB_TOKEN }}
+

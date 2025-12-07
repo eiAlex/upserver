@@ -1,0 +1,23 @@
+# Development dependencies and code verification tools
+# Install with: pip install -r requirements-dev.txt
+
+# Code formatting
+black>=25.0.0
+
+# Code analysis
+flake8>=7.0.0
+mypy>=1.19.0
+
+# Security
+bandit>=1.9.0
+safety>=3.7.0
+
+# Testing
+pytest>=9.0.0
+
+# Package building
+build>=1.3.0
+
+# Extra dependencies for mypy
+types-requests>=2.32.0
+types-setuptools>=75.0.0

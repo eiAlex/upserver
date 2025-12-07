@@ -8,19 +8,19 @@ from datetime import datetime
 def get_upload_page_html():
     """
     Get the HTML content for the upload page.
-    
+
     Returns:
         str: Complete HTML content for the upload interface
     """
-    current_time = datetime.now().strftime('%H:%M:%S')
-    
-    return f'''
+    current_time = datetime.now().strftime("%H:%M:%S")
+
+    return f"""
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
     <title>Upload Resumable - Server with Listing</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📁</text></svg>">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📁</text></svg>">\
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         {get_css_styles()}
@@ -90,17 +90,17 @@ def get_upload_page_html():
 </script>
 </body>
 </html>
-'''
+"""
 
 
 def get_css_styles():
     """
     Get CSS styles for the upload page.
-    
+
     Returns:
         str: CSS styles
     """
-    return '''
+    return """
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -336,24 +336,24 @@ def get_css_styles():
         #fileTable th {
             background: #F0F1FF;
         }
-    '''
+    """
 
 
 def get_javascript_code():
     """
     Get JavaScript code for the upload page.
-    
+
     Returns:
         str: JavaScript code
     """
-    return '''
+    return """
         let currentFile = null;
         let isPaused = false;
         let uploadStartTime = null;
         let totalUploaded = 0;
         let uploadSpeed = 0;
         let chunkSize = 5 * 1024 * 1024; // 5MB
-        
+
         function addLog(message, color='#333') {
             console.log('AddLog called:', message);
             const status = document.getElementById('status');
@@ -361,9 +361,9 @@ def get_javascript_code():
                 console.error('Status element not found!');
                 return;
             }
-            
+
             status.style.display = 'block';
-            
+
             const div = document.createElement('div');
             div.style.color = color;
             div.style.margin = '3px 0';
@@ -376,7 +376,7 @@ def get_javascript_code():
             div.innerHTML = `[${new Date().toLocaleTimeString()}] ${message}`;
             status.appendChild(div);
             status.scrollTop = status.scrollHeight;
-            
+
             while (status.children.length > 50) {
                 status.removeChild(status.firstChild);
             }
@@ -406,7 +406,7 @@ def get_javascript_code():
         function showFileList() {
             addLog('🔄 Requesting file list from server...', '#007bff');
             const fileListBox = document.getElementById('fileListBox');
-            
+
             fetch('/files')
                 .then(response => {
                     addLog(`📡 Response received: Status ${response.status}`, '#6c757d');
@@ -418,7 +418,7 @@ def get_javascript_code():
                 .then(files => {
                     addLog(`📋 Processing ${files.length} files...`, '#28a745');
                     let tbody = document.querySelector("#fileTable tbody");
-                    
+
                     if (files.length === 0) {
                         tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#666;padding:20px;">No files found on server</td></tr>';
                         addLog('📭 Empty directory - no files found', '#ffc107');
@@ -435,7 +435,7 @@ def get_javascript_code():
                         }).join('');
                         addLog(`✅ ${files.length} files listed successfully`, '#28a745');
                     }
-                    
+
                     fileListBox.style.display = "block";
                 })
                 .catch(error => {
@@ -453,85 +453,85 @@ def get_javascript_code():
             isPaused = false;
             uploadStartTime = Date.now();
             totalUploaded = 0;
-            
+
             document.getElementById('uploadBtn').style.display = 'none';
             document.getElementById('pauseBtn').style.display = 'inline-block';
             document.getElementById('progressContainer').style.display = 'block';
-            
+
             addLog(`🚀 Starting upload of ${currentFile.name}...`);
-            
+
             const totalChunks = Math.ceil(currentFile.size / chunkSize);
             let uploadedChunks = 0;
-            
+
             try {
                 for (let i = 0; i < totalChunks; i++) {
                     if (isPaused) {
                         addLog('⏸️ Upload paused by user');
                         return;
                     }
-                    
+
                     const start = i * chunkSize;
                     const end = Math.min(start + chunkSize, currentFile.size);
                     const chunk = currentFile.slice(start, end);
-                    
+
                     const chunkStartTime = Date.now();
-                    
+
                     const formData = new FormData();
                     formData.append('chunk', chunk);
                     formData.append('filename', currentFile.name);
                     formData.append('chunkIndex', i);
                     formData.append('totalChunks', totalChunks);
                     formData.append('fileSize', currentFile.size);
-                    
+
                     const response = await fetch('/upload', {
                         method: 'POST',
                         body: formData
                     });
-                    
+
                     if (!response.ok) {
                         throw new Error(`HTTP ${response.status}`);
                     }
-                    
+
                     uploadedChunks++;
                     totalUploaded += chunk.size;
-                    
+
                     const progress = (totalUploaded / currentFile.size) * 100;
                     document.getElementById('progressFill').style.width = progress + '%';
                     document.getElementById('progressFill').textContent = progress.toFixed(1) + '%';
-                    
+
                     const chunkTime = Date.now() - chunkStartTime;
                     const chunkSpeed = (chunk.size / 1024 / 1024) / (chunkTime / 1000);
                     uploadSpeed = chunkSpeed;
-                    
+
                     document.getElementById('uploadedSize').textContent = `${(totalUploaded / 1024 / 1024).toFixed(2)} MB / ${(currentFile.size / 1024 / 1024).toFixed(2)} MB`;
                     document.getElementById('uploadSpeed').textContent = `${uploadSpeed.toFixed(2)} MB/s`;
                     document.getElementById('chunkProgress').textContent = `${uploadedChunks} / ${totalChunks}`;
-                    
+
                     const remainingBytes = currentFile.size - totalUploaded;
                     const timeLeft = remainingBytes / (uploadSpeed * 1024 * 1024);
                     document.getElementById('timeLeft').textContent = timeLeft > 0 ? `${timeLeft.toFixed(0)}s` : 'Almost done!';
-                    
+
                     addLog(`📦 Chunk ${uploadedChunks}/${totalChunks} sent (${(chunk.size / 1024).toFixed(1)} KB) | ⚡ Processing: ${(chunkTime/1000).toFixed(3)}s`, '#17a2b8');
                 }
-                
+
                 const totalTime = (Date.now() - uploadStartTime) / 1000;
                 const minutes = Math.floor(totalTime / 60);
                 const seconds = Math.floor(totalTime % 60);
                 const timeDisplay = minutes > 0 ? `${minutes}m ${seconds}s` : `${seconds}s`;
                 const avgSpeed = (currentFile.size / 1024 / 1024 / totalTime).toFixed(2);
-                
+
                 document.getElementById('timeLeft').textContent = `Completed in ${timeDisplay}`;
                 document.getElementById('progressFill').textContent = '100% Complete!';
                 document.getElementById('uploadSpeed').textContent = `${avgSpeed} MB/s (avg)`;
-                
+
                 addLog(`🎉 Upload completed successfully! File: ${currentFile.name}`, '#008000');
                 addLog(`⏱️ Total time: ${timeDisplay} | Average speed: ${avgSpeed} MB/s`, '#28a745');
                 addLog(`📊 Statistics: ${totalChunks} chunks sent | Size: ${(currentFile.size / 1024 / 1024).toFixed(2)} MB`, '#6f42c1');
-                
+
                 setTimeout(() => {
                     resetUploadUI();
                 }, 3000);
-                
+
             } catch (error) {
                 addLog(`❌ Upload error: ${error.message}`, '#ff0000');
                 resetUploadUI();
@@ -558,4 +558,4 @@ def get_javascript_code():
             document.getElementById('resumeBtn').style.display = 'none';
             document.getElementById('uploadBtn').disabled = currentFile ? false : true;
         }
-    '''
+    """
