@@ -216,14 +216,14 @@ jobs:
     
     - name: Create Release
       if: steps.check_release.outputs.exists == 'false'
-      uses: ncipollo/create-release@v1
+      uses: softprops/action-gh-release@v2
       with:
-        tag: ${{ steps.get_version.outputs.tag }}
+        tag_name: ${{ steps.get_version.outputs.tag }}
         name: Release ${{ steps.get_version.outputs.tag }}
-        bodyFile: release_notes.md
+        body_path: release_notes.md
         draft: false
         prerelease: false
-        generateReleaseNotes: false
-        makeLatest: true
-        token: ${{ secrets.GITHUB_TOKEN }}
+        make_latest: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
