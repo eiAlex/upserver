@@ -1,0 +1,99 @@
+{
+    "_comment": "UpServer Advanced Configuration Example",
+    "_version": "0.2.0",
+    
+    "server": {
+        "host": "0.0.0.0",
+        "port": 8000,
+        "upload_dir": "./uploads"
+    },
+    
+    "upload": {
+        "max_file_size": "2GB",
+        "chunk_size": "10MB",
+        "allowed_extensions": [".jpg", ".png", ".pdf", ".mp4", ".zip", ".tar.gz"],
+        "temp_dir": "./temp"
+    },
+    
+    "security": {
+        "enable_cors": true,
+        "cors_origins": [
+            "http://localhost:3000",
+            "https://myapp.example.com"
+        ],
+        "max_concurrent_uploads": 10,
+        "rate_limiting": {
+            "enabled": true,
+            "requests_per_minute": 60
+        }
+    },
+    
+    "logging": {
+        "log_level": "INFO",
+        "log_file": "./logs/upserver.log",
+        "colored_output": true,
+        "log_format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+        "max_log_size": "100MB",
+        "backup_count": 5
+    },
+    
+    "features": {
+        "show_system_info": true,
+        "enable_file_listing": true,
+        "enable_download": true,
+        "enable_delete": false,
+        "auto_create_dirs": true
+    },
+    
+    "performance": {
+        "keep_alive_timeout": 30,
+        "max_connections": 100,
+        "buffer_size": "64KB",
+        "use_sendfile": true
+    },
+    
+    "ui": {
+        "title": "My File Server",
+        "theme": "dark",
+        "show_progress": true,
+        "show_speed": true,
+        "show_eta": true,
+        "custom_css": "./static/custom.css"
+    },
+    
+    "notifications": {
+        "email": {
+            "enabled": false,
+            "smtp_server": "smtp.gmail.com",
+            "smtp_port": 587,
+            "username": "your-email@gmail.com",
+            "password": "your-app-password",
+            "notify_on_upload": true,
+            "notify_on_error": true
+        },
+        "webhook": {
+            "enabled": false,
+            "url": "https://hooks.example.com/upserver",
+            "events": ["upload_complete", "upload_failed"]
+        }
+    },
+    
+    "storage": {
+        "cleanup": {
+            "enabled": true,
+            "max_age_days": 30,
+            "run_interval_hours": 24
+        },
+        "compression": {
+            "enabled": false,
+            "algorithm": "gzip",
+            "level": 6
+        }
+    },
+    
+    "monitoring": {
+        "health_check_endpoint": "/health",
+        "metrics_endpoint": "/metrics",
+        "prometheus_enabled": false
+    }
+}
