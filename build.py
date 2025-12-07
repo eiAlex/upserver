@@ -8,7 +8,7 @@ This script helps with building, testing, and distributing the upserver package.
 import sys
 import subprocess
 import shutil
-import os
+
 from pathlib import Path
 
 # Colors for terminal output
