@@ -29,7 +29,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -e .
-        pip install pytest pytest-cov black flake8 mypy bandit
+        pip install pytest pytest-cov black flake8 mypy
     
     - name: Run code formatting check
       run: |
@@ -43,10 +43,6 @@ jobs:
       run: |
         mypy upserver/ --ignore-missing-imports
     
-    - name: Run security scan with bandit
-      run: |
-        bandit -r upserver/ -c .bandit
-    
     - name: Run tests
       run: |
         pytest tests/ -v --cov=upserver --cov-report=xml --cov-report=term-missing
@@ -59,8 +55,32 @@ jobs:
         name: codecov-umbrella
         fail_ci_if_error: false
 
+  security:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install bandit safety
+    
+    - name: Run security scan with bandit
+      run: |
+        bandit -r upserver/ -c .bandit -f json -o bandit-report.json || true
+        bandit -r upserver/ -c .bandit
+    
+    - name: Check for known vulnerabilities
+      run: |
+        safety check || true
+
   build:
-    needs: [test]
+    needs: [test, security]
     runs-on: ubuntu-latest
     
     steps:
