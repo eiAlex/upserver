@@ -8,13 +8,13 @@ from datetime import datetime
 def get_upload_page_html():
     """
     Get the HTML content for the upload page.
-    
+
     Returns:
         str: Complete HTML content for the upload interface
     """
-    current_time = datetime.now().strftime('%H:%M:%S')
-    
-    return f'''
+    current_time = datetime.now().strftime("%H:%M:%S")
+
+    return f"""
 <!DOCTYPE html>
 <html>
 <head>
@@ -90,17 +90,17 @@ def get_upload_page_html():
 </script>
 </body>
 </html>
-'''
+"""
 
 
 def get_css_styles():
     """
     Get CSS styles for the upload page.
-    
+
     Returns:
         str: CSS styles
     """
-    return '''
+    return """
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -336,17 +336,17 @@ def get_css_styles():
         #fileTable th {
             background: #F0F1FF;
         }
-    '''
+    """
 
 
 def get_javascript_code():
     """
     Get JavaScript code for the upload page.
-    
+
     Returns:
         str: JavaScript code
     """
-    return '''
+    return """
         let currentFile = null;
         let isPaused = false;
         let uploadStartTime = null;
@@ -558,4 +558,4 @@ def get_javascript_code():
             document.getElementById('resumeBtn').style.display = 'none';
             document.getElementById('uploadBtn').disabled = currentFile ? false : true;
         }
-    '''
+    """

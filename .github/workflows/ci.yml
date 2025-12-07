@@ -33,7 +33,7 @@ jobs:
     
     - name: Run code formatting check
       run: |
-        black --check upserver/ tests/
+        python -m black --check upserver/ tests/
     
     - name: Run linting
       run: |

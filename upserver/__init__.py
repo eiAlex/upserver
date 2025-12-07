@@ -6,7 +6,7 @@ with resumable chunked uploads, web interface, and file management capabilities.
 
 Features:
 - Resumable chunked file uploads
-- Web interface for file management  
+- Web interface for file management
 - Real-time upload progress tracking
 - File listing and download
 - Cross-platform compatibility
@@ -23,11 +23,11 @@ from .logging_config import setup_logging, ServerLogger
 from .utils import sanitize_filename, get_disk_space, format_file_size
 
 __all__ = [
-    "FileServer", 
+    "FileServer",
     "ServerConfig",
     "setup_logging",
     "ServerLogger",
     "sanitize_filename",
-    "get_disk_space", 
-    "format_file_size"
+    "get_disk_space",
+    "format_file_size",
 ]
