@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "upserver"
-version = "0.1.0"
-description = "A file server for uploading and downloading files"
+version = "0.2.0"
+description = "A resumable file server for uploading and downloading files"
 readme = "README.md"
 requires-python = ">=3.8.1"
 license = {text = "MIT"}
