@@ -1,0 +1,72 @@
+FROM node:24-bookworm-slim AS builder
+
+WORKDIR /app
+
+# Dependências do sistema
+RUN apt-get update && apt-get install -y \
+    git \
+    python3 \
+    build-essential \
+    curl \
+    pkg-config \
+    && rm -rf /var/lib/apt/lists/*
+
+# Instala Rust (cargo + rustc)
+RUN curl https://sh.rustup.rs -sSf | sh -s -- -y
+
+ENV PATH="/root/.cargo/bin:${PATH}"
+
+# Instala pnpm
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
+# Clona o projeto
+RUN git clone https://github.com/paperclipai/paperclip.git .
+
+# Dependências
+RUN pnpm install --frozen-lockfile
+
+# Confirma instalação
+RUN cargo --version
+RUN rustc --version
+
+# Gera o cliente do banco de dados usado pelo servidor
+RUN pnpm db:generate
+
+# Build
+RUN pnpm build
+
+# Runtime
+FROM node:24-bookworm-slim
+
+WORKDIR /app
+
+RUN corepack enable
+
+ENV COREPACK_HOME=/home/node/.cache/node/corepack
+
+COPY --from=builder --chown=node:node /app /app
+
+RUN pnpm --version \
+    && mkdir -p /paperclip \
+    && chown node:node /app \
+    && chown -R node:node /paperclip /home/node/.cache/node/corepack
+
+ENV HOST=0.0.0.0
+ENV PAPERCLIP_DEPLOYMENT_MODE=authenticated
+ENV PAPERCLIP_BIND=lan
+ENV PAPERCLIP_HOME=/paperclip
+ENV PORT=3100
+
+# Configuração editável. Valores passados no `docker run -e` têm prioridade.
+# Chave de autenticação (troque por uma chave forte e mantenha fora do Git).
+# ENV BETTER_AUTH_SECRET=troque-por-uma-chave-forte
+
+# Banco externo (opcional). Descomente para não usar o PostgreSQL embutido.
+# Não deixe a variável definida e vazia: use apenas com um valor real.
+# ENV DATABASE_URL=postgres://usuario:senha@host:5432/banco
+
+EXPOSE 3100
+
+USER node
+
+CMD ["pnpm", "--filter", "@paperclipai/server", "dev"]
